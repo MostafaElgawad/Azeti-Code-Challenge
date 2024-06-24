@@ -24,7 +24,15 @@ def send_secret_rest(secret_value: int):
     #
     # Assuming secret_value = 50, then the request will contain the following
     # body: {"value": 50}
-    pass
+    try:
+        url = 'http://server:80//secret_number'
+        response = requests.post(url, data=json.dumps({'value': secret_value}))
+        response.raise_for_status()
+        return response.text
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to send secret {secret_value}: {e}")
+
+    
 
 
 def on_mqtt_connect(client, userdata, flags, rc):
@@ -37,10 +45,28 @@ def on_mqtt_message(client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage):
     # we are interested just on the value) and send this value to the REST
     # server... or maybe the sending to REST should be done somewhere else...
     # do you have any idea why?
-    message = json.loads(msg.payload)
-    print("Message received-> " + msg.topic + " " + str(message.get('value')))
-    secret_received_event.set()
-    client.disconnect()
+
+    # it is crucial to handle any exceptions and ensure the MQTT client disconnects properly 
+    # after the message is processed
+    try:
+        message = json.loads(msg.payload)
+        secret_value = message.get('value')
+        if secret_value is not None:
+            response = send_secret_rest(secret_value)
+            if response != 'OK':
+                print("failed to set secret number")
+            else:
+                print(f"successfully recieved secret value:{secret_value} and sent it back"
+                       f" with ack from server:{response}")
+                secret_received_event.set()
+                client.disconnect()
+        else:
+            print("Received message does not contain value")
+    except json.JSONDecodeError as e:
+        print(f'Failed to decode message: {e}')
+    except Exception as e:
+        print(f'Error processing message: {e}')
+
 
 
 def connect_mqtt() -> mqtt.Client:
