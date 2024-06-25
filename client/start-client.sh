@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# URL to check
 URL="http://server:80/ready"
 
 # while true; do
