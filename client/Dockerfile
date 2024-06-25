@@ -2,8 +2,10 @@ FROM python:3.8-alpine
 
 WORKDIR /usr/src/app
 
-COPY client.py requirements.txt ./
+COPY start-client.sh client.py requirements.txt ./
+
+RUN apk add --no-cache curl
 
 RUN pip install -r requirements.txt
 
-CMD ["python3", "client.py"]
+CMD ["./start-client.sh"]

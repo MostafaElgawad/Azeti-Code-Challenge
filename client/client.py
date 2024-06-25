@@ -111,7 +111,7 @@ def wait_for_server_ready():
 def main():
     global mqtt_client
 
-    wait_for_server_ready()
+    #wait_for_server_ready()
 
     mqtt_client = connect_mqtt()
     mqtt_connection_event.wait()
