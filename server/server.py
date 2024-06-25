@@ -28,7 +28,7 @@ def initialize_database_connection():
     # This will mock a connection to a database and do other intermediary
     # tasks. Depending on the servers "load", it may take more or less time.
     print('Starting Database connection')
-    sleep(random.randint(5, 10))  # A complex initialization, as you can see...
+    sleep(random.randint(5, 60))  # A complex initialization, as you can see...
     print('Database connection established')
 
 
